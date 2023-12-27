@@ -248,6 +248,10 @@ if IS_PYDANTIC_V2:
         # else:
         #     fields_values.update(values)
         # End SQLModel override
+        object.__setattr__(self_instance, "__pydantic_fields_set__", _fields_set)
+        if not cls.__pydantic_root_model__:
+            object.__setattr__(self_instance, "__pydantic_extra__", _extra)
+
         # SQLModel override
         # Do not set __dict__, instead use setattr to trigger SQLAlchemy
         # object.__setattr__(new_obj, "__dict__", fields_values)
@@ -255,9 +259,6 @@ if IS_PYDANTIC_V2:
         for key, value in {**old_dict, **fields_values}.items():
             setattr(self_instance, key, value)
         # End SQLModel override
-        object.__setattr__(self_instance, "__pydantic_fields_set__", _fields_set)
-        if not cls.__pydantic_root_model__:
-            object.__setattr__(self_instance, "__pydantic_extra__", _extra)
 
         if cls.__pydantic_post_init__:
             self_instance.model_post_init(None)
